@@ -9,6 +9,14 @@ async function registerController(req,res){
     const {username,email,password} = req.body
 
     try {
+
+        //empty username and password
+        if(email=='' || password=='' || username==''){
+            return res.status(400).json({
+                message:'All fields are required'
+            })
+        }
+
         //check for username or email exists
         const isUserExists = await userModel.findOne({
             $or:[
@@ -43,6 +51,11 @@ async function registerController(req,res){
 
         const {password: _, ...updatedUser} = user.toObject() // password field ko exclude karna
 
+
+        //otp generation
+        const otp = Math.floor(100000 + Math.random() * 900000).toString()
+        console.log(`OTP for email: ${email} is ${otp}`)
+
         res.status(201).json({
             message:"User created successfully",
             user:updatedUser,
@@ -65,7 +78,7 @@ async function loginController(req,res){
         //empty username and password
         if(email=='' || password==''){
             return res.status(400).json({
-                message:'Invalid email or password'
+                message:'All fields are required'
             })
         }
         
