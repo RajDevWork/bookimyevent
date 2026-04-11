@@ -56,7 +56,7 @@ async function registerController(req,res){
 
         // Generate OTP for account verification
         const otp = Math.floor(100000 + Math.random() * 900000).toString()
-        console.log(`OTP for email: ${email} is ${otp}`)
+        // console.log(`OTP for email: ${email} is ${otp}`)
 
         // Save OTP to database with expiration
         await otpModel.create({
@@ -113,7 +113,7 @@ async function loginController(req,res){
         if(!isValidUser.isVerified && isValidUser.role === "user"){
             // Generate OTP for account verification
             const otp = Math.floor(100000 + Math.random() * 900000).toString()
-            console.log(`OTP for email: ${email} is ${otp}`)
+            // console.log(`OTP for email: ${email} is ${otp}`)
 
             await otpModel.deleteMany({email,action:"account_verification"}) // Purane OTPs ko delete karna
 
