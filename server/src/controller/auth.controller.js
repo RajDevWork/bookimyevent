@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken")
 const userModel = require("../models/user.model")
 const bcrypjs = require("bcryptjs")
+const { sendOtpEmail } = require("../utils/email")
+const otpModel = require("../models/otp.model")
 
 
 
@@ -52,12 +54,22 @@ async function registerController(req,res){
         const {password: _, ...updatedUser} = user.toObject() // password field ko exclude karna
 
 
-        //otp generation
+        // Generate OTP for account verification
         const otp = Math.floor(100000 + Math.random() * 900000).toString()
         console.log(`OTP for email: ${email} is ${otp}`)
 
+        // Save OTP to database with expiration
+        await otpModel.create({
+            email,
+            otp,
+            action:"account_verification"
+        })
+        // Send OTP email to user
+        await sendOtpEmail(email,otp,"account_verification")
+
+
         res.status(201).json({
-            message:"User created successfully",
+            message:"User registered successfully and OTP sent to email for verification",
             user:updatedUser,
             token
         })
@@ -96,13 +108,37 @@ async function loginController(req,res){
                 message:'Invalid email or password'
             })
         }  
+
+
+        if(!isValidUser.isVerified && isValidUser.role === "user"){
+            // Generate OTP for account verification
+            const otp = Math.floor(100000 + Math.random() * 900000).toString()
+            console.log(`OTP for email: ${email} is ${otp}`)
+
+            await otpModel.deleteMany({email,action:"account_verification"}) // Purane OTPs ko delete karna
+
+            // Save OTP to database with expiration
+            await otpModel.create({
+                email,
+                otp,
+                action:"account_verification"
+            })
+            // Send OTP email to user
+            await sendOtpEmail(email,otp,"account_verification")
+            return res.status(403).json({
+                message:'Account not verified. OTP sent to email for verification.'
+            })  
+        }
+
+
         
         // create token
 
         const token = await jwt.sign({
             id:isValidUser._id,
             email:isValidUser.email,
-            username:isValidUser.username
+            username:isValidUser.username,
+            role:isValidUser.role
         },process.env.JWT_SECRET,{expiresIn:'1d'})
 
         res.cookie("token",token);
@@ -123,7 +159,28 @@ async function loginController(req,res){
 }
 
 async function VerifyOTPController(req,res){
-    res.send("Verify OTP")
+    const {email,otp} = req.body
+
+    try {
+        //check for otp
+        const validOTP = await otpModel.findOne({email,otp,action:"account_verification"})
+        if(!validOTP){
+            return res.status(400).json({
+                message:'Invalid OTP'
+            })
+        }
+        //update user verification status
+        await userModel.findOneAndUpdate({email},{isVerified:true})
+        //delete otp after verification
+        await otpModel.deleteMany({email,action:"account_verification"})
+        res.status(200).json({
+            message:'Account verified successfully'
+        })
+    } catch (error) {
+        res.status(400).json({
+            message:error.message
+        })
+    }
 }
 
 
