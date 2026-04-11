@@ -57,8 +57,56 @@ async function registerController(req,res){
 }
 
 async function loginController(req,res){
+    
+    const {email,password} = req.body
 
-    res.send("Login controller")
+    try {
+
+        //empty username and password
+        if(email=='' || password==''){
+            return res.status(400).json({
+                message:'Invalid email or password'
+            })
+        }
+        
+        //check for email
+        const isValidUser = await userModel.findOne({email}).select("+password")
+        if(!isValidUser){
+            return res.status(401).json({
+                message:'Invalid email or password'
+            })
+        }
+        //check for password
+        const isValidPassword = await bcrypjs.compare(password,isValidUser.password)
+        if(!isValidPassword){
+            return res.status(401).json({
+                message:'Invalid email or password'
+            })
+        }  
+        
+        // create token
+
+        const token = await jwt.sign({
+            id:isValidUser._id,
+            email:isValidUser.email,
+            username:isValidUser.username
+        },process.env.JWT_SECRET,{expiresIn:'1d'})
+
+        res.cookie("token",token);
+
+        res.status(200).json({
+            message:"User loggedin successfully",
+            token
+        })
+
+
+
+
+    } catch (error) {
+        res.status(401).json({
+            message:'Invalid email or password'
+        })
+    }
 }
 
 async function VerifyOTPController(req,res){
