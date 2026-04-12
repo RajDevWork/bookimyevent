@@ -25,11 +25,11 @@ const eventSchema = new mongoose.Schema({
             type:String,
             required:true
         },
-        totalSeates:{
+        totalSeats:{
             type:Number,
             required:true
         },
-        avaiableSeates:{
+        availableSeats:{
             type:Number,
             required:true
         },
