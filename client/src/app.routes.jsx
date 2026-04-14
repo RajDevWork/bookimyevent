@@ -4,6 +4,8 @@ import Register from './features/auth/pages/Register'
 import Home from './features/event/pages/Home'
 import EventDetails from './features/event/pages/EventDetails'
 import AllEvents from './features/event/pages/AllEvents'
+import CreateEvent from './features/event/pages/CreateEvent'
+import AllBookings from './features/booking/pages/AllBookings'
 
 export const router = createBrowserRouter([
     {
@@ -15,8 +17,16 @@ export const router = createBrowserRouter([
         element: <AllEvents />
     },
     {
+        path: '/events-create',
+        element: <CreateEvent />
+    },
+    {
         path: '/event/:id',
         element: <EventDetails />
+    },
+    {
+        path: '/bookings',
+        element: <AllBookings />
     },
     {
         path:'/login',

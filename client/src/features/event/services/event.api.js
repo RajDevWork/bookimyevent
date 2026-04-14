@@ -37,6 +37,27 @@ const eventAPI = {
     }
   },
 
+  // Create a new event
+  createEvent: async (eventData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/events`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(eventData),
+      })
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null)
+        throw new Error(errorData?.message || 'Failed to create event')
+      }
+      return await response.json()
+    } catch (error) {
+      console.error('Error creating event:', error)
+      throw error
+    }
+  },
+
   // Search events
   searchEvents: async (query) => {
     try {
