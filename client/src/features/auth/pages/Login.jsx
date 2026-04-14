@@ -1,8 +1,25 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
+import { useAuth } from '../hooks/useAuth';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [email,setEmail] = useState('')
+  const [password,setPassword] = useState('')
+  const {loading, handleLogin} = useAuth()
+  const navigate = useNavigate()
+
+  const handleSubmit = async (e)=>{
+    e.preventDefault()
+    await handleLogin(email,password)
+    navigate("/")
+  }
+
+  if(loading){
+    return (
+      <main className='min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-black px-4 py-10'><h1 className='mt-3 text-3xl font-bold text-white'>Loading....</h1></main>
+    )
+  }
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-black px-4 py-10">
@@ -17,7 +34,7 @@ const Login = () => {
         </header>
 
         {/* Form */}
-        <form className="space-y-5">
+        <form className="space-y-5" onSubmit={handleSubmit}>
           {/* Email */}
           <div className="space-y-2">
             <label className="text-sm text-slate-300">Email</label>
@@ -25,6 +42,8 @@ const Login = () => {
               type="email"
               placeholder="Enter your email"
               className="w-full rounded-xl border border-slate-600 bg-slate-800 px-4 py-3 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 transition"
+              value={email}
+              onChange={(e)=>setEmail(e.target.value)}
             />
           </div>
 
@@ -36,6 +55,8 @@ const Login = () => {
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
                 className="w-full rounded-xl border border-slate-600 bg-slate-800 px-4 py-3 pr-12 text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 transition"
+                value={password}
+                onChange={(e)=>setPassword(e.target.value)}
               />
               <button
                 type="button"

@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-    baseURL:"http://localhost/api/auth/",
+    baseURL:"http://localhost:3000/api/auth/",
     withCredentials:true
 })
 
@@ -15,5 +15,12 @@ export const login = async (email, password) => {
 
 export const register = async (username,email,password)=>{
     const response = await api.post("/register",{username,email,password})
+    return response.data
+}
+
+
+//verify account
+export const VerifyMyAccount = async (email,otp)=>{
+    const response = await api.post("verify-otp",{email,otp})
     return response.data
 }
