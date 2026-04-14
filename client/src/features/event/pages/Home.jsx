@@ -11,7 +11,7 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [error, setError] = useState(null)
 
-  console.log(error)
+//   console.log(error)
 
   const categories = ['All', 'Technology', 'Business', 'Entertainment', 'Sports', 'Education']
 
@@ -78,8 +78,9 @@ const Home = () => {
 
   // Filter events based on search and category
   useEffect(() => {
-    let filtered = events
-
+    let filtered = events.events
+// console.log("filtered = ",filtered)
+// console.log("selectedCategory = ",selectedCategory)
     // Filter by category
     if (selectedCategory !== 'All') {
       filtered = filtered.filter(event => event.category === selectedCategory)
@@ -93,6 +94,7 @@ const Home = () => {
         event.location.toLowerCase().includes(searchQuery.toLowerCase())
       )
     }
+    
 
     setFilteredEvents(filtered)
   }, [searchQuery, selectedCategory, events])
@@ -113,6 +115,11 @@ const Home = () => {
     if (percentage > 20) return 'text-yellow-400'
     return 'text-red-400'
   }
+
+//   console.log("All events = ",events)
+// console.log("filteredEvents = ",filteredEvents)
+
+// console.log("loading = ",loading)
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-black">
