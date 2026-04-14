@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router'
 import NavBar from '../components/NavBar'
-import eventAPI from '../services/event.api'
+import { useEvent } from '../hooks/useEvent'
 
 const Home = () => {
-  const [events, setEvents] = useState([])
+  // const [events, setEvents] = useState([])
   const [filteredEvents, setFilteredEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [error, setError] = useState(null)
+  const {events,handleGetAllEvents} = useEvent()
 
 //   console.log(error)
 
@@ -19,55 +20,20 @@ const Home = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        setLoading(true)
-        const data = await eventAPI.getAllEvents()
-        setEvents(data)
-        setFilteredEvents(data)
-        setError(null)
+        await handleGetAllEvents()
+
+        console.log("events = ",events)
+        // setLoading(true)
+        // const data = await eventAPI.getAllEvents()
+        // setEvents(data)
+        setFilteredEvents(events)
+        // setError(null)
       } catch (err) {
         console.error('Failed to fetch events:', err)
         // Mock data for development
-        const mockEvents = [
-          {
-            _id: '69db16e92302c5ac98dda268',
-            title: 'Full Stack JavaScript Bootcamp',
-            description: 'An intensive bootcamp covering MERN stack, system design basics, and real-world project building.',
-            date: '2026-04-19T03:52:09.332Z',
-            location: 'Bangalore Tech Park, India',
-            ticketPrice: 999,
-            category: 'Technology',
-            totalSeats: 180,
-            availableSeats: 178,
-            imageUrl: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=500&h=300&fit=crop',
-          },
-          {
-            _id: '69db16e92302c5ac98dda269',
-            title: 'React Advanced Patterns',
-            description: 'Master advanced React patterns and best practices for building scalable applications.',
-            date: '2026-04-25T10:00:00.000Z',
-            location: 'Mumbai Tech Hub, India',
-            ticketPrice: 799,
-            category: 'Technology',
-            totalSeats: 100,
-            availableSeats: 45,
-            imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500&h=300&fit=crop',
-          },
-          {
-            _id: '69db16e92302c5ac98dda26a',
-            title: 'Startup Pitch Competition',
-            description: 'Showcase your startup idea and win exciting prizes. Pitch to top investors and VCs.',
-            date: '2026-05-01T14:00:00.000Z',
-            location: 'Delhi Convention Center, India',
-            ticketPrice: 500,
-            category: 'Business',
-            totalSeats: 200,
-            availableSeats: 120,
-            imageUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&h=300&fit=crop',
-          },
-        ]
-        setEvents(mockEvents)
-        setFilteredEvents(mockEvents)
-        setError(null)
+        // setEvents(mockEvents)
+        setFilteredEvents([])
+        // setError(null)
       } finally {
         setLoading(false)
       }
@@ -78,7 +44,7 @@ const Home = () => {
 
   // Filter events based on search and category
   useEffect(() => {
-    let filtered = events.events
+    let filtered = events
 // console.log("filtered = ",filtered)
 // console.log("selectedCategory = ",selectedCategory)
     // Filter by category
@@ -198,9 +164,9 @@ const Home = () => {
                 <p className="text-slate-400">Loading amazing events...</p>
               </div>
             </div>
-          ) : filteredEvents.length > 0 ? (
+          ) : filteredEvents?.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredEvents.map((event) => (
+              {filteredEvents?.map((event) => (
                 <Link
                   key={event._id}
                   to={`/event/${event._id}`}

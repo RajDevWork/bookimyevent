@@ -1,135 +1,37 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router'
 import NavBar from '../components/NavBar'
-import eventAPI from '../services/event.api'
+import { useEvent } from '../hooks/useEvent'
 
 const AllEvents = () => {
-  const [events, setEvents] = useState([])
+  // const [events, setEvents] = useState([])
   const [filteredEvents, setFilteredEvents] = useState([])
   const [upcomingEvents, setUpcomingEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [sortBy, setSortBy] = useState('date')
+  const {events,handleGetAllEvents} = useEvent()
 
   const categories = ['All', 'Technology', 'Business', 'Entertainment', 'Sports', 'Education']
 
-  // Mock events data for development
-  const mockEvents = [
-    {
-      _id: '1',
-      title: 'Full Stack JavaScript Bootcamp',
-      description: 'An intensive bootcamp covering MERN stack, system design basics, and real-world project building.',
-      date: '2026-04-19T03:52:09.332Z',
-      location: 'Bangalore Tech Park, India',
-      ticketPrice: 999,
-      category: 'Technology',
-      totalSeats: 180,
-      availableSeats: 178,
-      imageUrl: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=500&h=300&fit=crop',
-    },
-    {
-      _id: '2',
-      title: 'React Advanced Patterns',
-      description: 'Master advanced React patterns and best practices for building scalable applications.',
-      date: '2026-04-25T10:00:00.000Z',
-      location: 'Mumbai Tech Hub, India',
-      ticketPrice: 799,
-      category: 'Technology',
-      totalSeats: 100,
-      availableSeats: 45,
-      imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500&h=300&fit=crop',
-    },
-    {
-      _id: '3',
-      title: 'Startup Pitch Competition',
-      description: 'Showcase your startup idea and win exciting prizes. Pitch to top investors and VCs.',
-      date: '2026-05-01T14:00:00.000Z',
-      location: 'Delhi Convention Center, India',
-      ticketPrice: 500,
-      category: 'Business',
-      totalSeats: 200,
-      availableSeats: 120,
-      imageUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&h=300&fit=crop',
-    },
-    {
-      _id: '4',
-      title: 'Digital Marketing Masterclass',
-      description: 'Learn the latest digital marketing strategies from industry experts.',
-      date: '2026-05-15T09:00:00.000Z',
-      location: 'Chennai Business District, India',
-      ticketPrice: 699,
-      category: 'Business',
-      totalSeats: 150,
-      availableSeats: 89,
-      imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500&h=300&fit=crop',
-    },
-    {
-      _id: '5',
-      title: 'AI & Machine Learning Summit',
-      description: 'Explore the future of AI and ML with cutting-edge research and applications.',
-      date: '2026-06-10T08:30:00.000Z',
-      location: 'Hyderabad Tech City, India',
-      ticketPrice: 1299,
-      category: 'Technology',
-      totalSeats: 300,
-      availableSeats: 245,
-      imageUrl: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=500&h=300&fit=crop',
-    },
-    {
-      _id: '6',
-      title: 'Music Festival 2026',
-      description: 'A spectacular music festival featuring top artists from around the world.',
-      date: '2026-07-20T18:00:00.000Z',
-      location: 'Goa Beach Resort, India',
-      ticketPrice: 2499,
-      category: 'Entertainment',
-      totalSeats: 5000,
-      availableSeats: 3241,
-      imageUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&h=300&fit=crop',
-    },
-    {
-      _id: '7',
-      title: 'Yoga & Wellness Retreat',
-      description: 'Find inner peace and rejuvenate your mind, body, and soul.',
-      date: '2026-08-05T06:00:00.000Z',
-      location: 'Rishikesh Ashram, India',
-      ticketPrice: 1599,
-      category: 'Education',
-      totalSeats: 80,
-      availableSeats: 23,
-      imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=300&fit=crop',
-    },
-    {
-      _id: '8',
-      title: 'Cricket Championship Finals',
-      description: 'Witness the ultimate showdown between the best cricket teams.',
-      date: '2026-09-12T15:30:00.000Z',
-      location: 'Eden Gardens, Kolkata, India',
-      ticketPrice: 899,
-      category: 'Sports',
-      totalSeats: 80000,
-      availableSeats: 45230,
-      imageUrl: 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=500&h=300&fit=crop',
-    },
-  ]
 
   // Fetch events on component mount
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        setLoading(true)
-        // Try to fetch from API first
-        const data = await eventAPI.getAllEvents()
+        await handleGetAllEvents();
 
-        console.log("data = ",data)
-        setEvents(data.events)
-        setFilteredEvents(data.events)
+        // console.log("data = ",events)
+
+        // console.log("data = ",data)
+        // setEvents(data.events)
+        // setFilteredEvents(data.events)
       } catch (err) {
-        console.log('Using mock data for development')
+        console.log('Using mock data for development',err)
         // Use mock data if API fails
-        setEvents(mockEvents)
-        setFilteredEvents(mockEvents)
+        // setEvents([])
+        setFilteredEvents([])
       } finally {
         setLoading(false)
       }
@@ -208,6 +110,12 @@ const AllEvents = () => {
     const diffTime = eventDate - today
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     return diffDays
+  }
+
+  if(loading){
+    return (<main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-black">
+      <h1>Loading....</h1>
+    </main>)
   }
 
   return (

@@ -6,6 +6,8 @@ import EventDetails from './features/event/pages/EventDetails'
 import AllEvents from './features/event/pages/AllEvents'
 import CreateEvent from './features/event/pages/CreateEvent'
 import AllBookings from './features/booking/pages/AllBookings'
+import ProtectedRoute from './shared/routes/ProtectedRoute'
+import AdminRoute from './shared/routes/AdminRoute'
 
 export const router = createBrowserRouter([
     {
@@ -18,7 +20,7 @@ export const router = createBrowserRouter([
     },
     {
         path: '/events-create',
-        element: <CreateEvent />
+        element: <AdminRoute><CreateEvent /></AdminRoute>
     },
     {
         path: '/event/:id',
@@ -26,7 +28,7 @@ export const router = createBrowserRouter([
     },
     {
         path: '/bookings',
-        element: <AllBookings />
+        element: <ProtectedRoute><AllBookings /></ProtectedRoute>
     },
     {
         path:'/login',
